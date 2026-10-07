@@ -4,7 +4,7 @@ services:
     name: asha-backend
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && python ml/train_model.py
+    buildCommand: pip install --prefer-binary -r requirements.txt && python ml/train_model.py
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
@@ -27,9 +27,6 @@ services:
     plan: free
     routes:
       - type: rewrite
-        source: /api/*
-        destination: https://asha-backend.onrender.com/api/$1
-      - type: rewrite
         source: /*
         destination: /index.html
     envVars:
@@ -37,7 +34,7 @@ services:
         value: https://asha-backend.onrender.com
 
 databases:
-  # ── Free PostgreSQL (90-day trial on Render free plan) ─────────────────────
+  # ── Free PostgreSQL ─────────────────────────────────────────────────────────
   - name: asha-db
     plan: free
     databaseName: asha_health
