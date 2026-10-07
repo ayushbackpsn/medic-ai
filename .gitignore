@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+env/
+.venv/
+.env
+
+# Node
+node_modules/
+frontend/dist/
+
+# Database (local SQLite — don't commit)
+*.db
+*.db-shm
+*.db-wal
+
+# Datasets — large raw zip files
+*.zip
+backend/data/*.csv
+
+# DO NOT ignore the trained model — Render needs it
+# backend/ml/triage_model.joblib  ← committed intentionally
+
+# Pytest
+.pytest_cache/
+*.pytest_cache
+
+# IDE
+.vscode/
+.idea/
+*.DS_Store
+
+# Logs
+*.log
+
+# Jupyter
+*.ipynb_checkpoints/
+
+# Symptom CSV at root (raw dataset file)
+Symptom-severity.csv
