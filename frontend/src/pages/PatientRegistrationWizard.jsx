@@ -686,65 +686,159 @@ export default function PatientRegistrationWizard() {
               </div>
 
               {/* Prescribed Primary Medications (ASHA Essential Drug Kit) - ONLY for MEDIUM Risk */}
-              {assessmentResult.risk_level === 'MEDIUM' && assessmentResult.prescriptions && assessmentResult.prescriptions.length > 0 && (
-                <div className="bg-emerald-50 border-2 border-emerald-300 p-5 rounded-2xl space-y-4 shadow-sm animate-fade-in">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200 pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                        💊
-                      </span>
-                      <div>
-                        <h4 className="font-black text-emerald-950 text-sm sm:text-base">
-                          Prescribed Primary Medications (ASHA Essential Drug Kit)
-                        </h4>
-                        <p className="text-xs text-emerald-700 font-medium">
-                          Supportive first-line treatment for Moderate / Medium risk cases
-                        </p>
+              {assessmentResult.risk_level === 'MEDIUM' && (
+                (() => {
+                  let meds = assessmentResult.prescriptions || [];
+                  if (meds.length === 0) {
+                    const syms = (symptoms || []).map(s => (s.symptom_name || '').toLowerCase());
+                    const temp = Number(vitals.temperature_c || 37.0);
+                    if (syms.includes('fever') || temp >= 37.8 || syms.includes('headache') || syms.includes('severe_pain')) {
+                      meds.push({
+                        medicine_name: "Paracetamol (PCM) 500mg",
+                        dosage: "1 Tablet (500mg)",
+                        frequency: "Every 6-8 hours as needed (Max 3-4 tablets/day)",
+                        duration: "3 Days",
+                        instructions: "Take after food for fever & pain relief. Consult PHC doctor if fever lasts > 3 days."
+                      });
+                    }
+                    if (syms.includes('cough') || syms.includes('cold') || syms.includes('sore throat')) {
+                      meds.push({
+                        medicine_name: "Cetirizine 10mg",
+                        dosage: "1 Tablet (10mg)",
+                        frequency: "Once daily at bedtime",
+                        duration: "3 - 5 Days",
+                        instructions: "Relieves cold, sneezing, and cough. May cause mild drowsiness."
+                      });
+                      meds.push({
+                        medicine_name: "Steam Inhalation & Saline Gargle",
+                        dosage: "Steam for 5-10 mins",
+                        frequency: "2 - 3 Times daily",
+                        duration: "4 - 5 Days",
+                        instructions: "Loosens chest congestion and relieves throat irritation."
+                      });
+                    }
+                    if (syms.includes('diarrhea')) {
+                      meds.push({
+                        medicine_name: "Oral Rehydration Salts (ORS)",
+                        dosage: "1 Sachet in 1 Liter clean boiled water",
+                        frequency: "Drink continuously after every loose stool",
+                        duration: "3 Days",
+                        instructions: "Prevents dehydration and restores electrolytes."
+                      });
+                      meds.push({
+                        medicine_name: "Zinc Sulfate 20mg",
+                        dosage: "1 Tablet (20mg)",
+                        frequency: "Once daily after meals",
+                        duration: "14 Days",
+                        instructions: "Promotes gut healing and reduces recurrence."
+                      });
+                    }
+                    if (syms.includes('vomiting') || syms.includes('nausea')) {
+                      meds.push({
+                        medicine_name: "Domperidone 10mg / Ondansetron 4mg",
+                        dosage: "1 Tablet",
+                        frequency: "Twice daily 30 mins before food",
+                        duration: "2 Days",
+                        instructions: "Take with small sips of water. Avoid oily or heavy foods."
+                      });
+                    }
+                    if (syms.includes('abdominal pain') || syms.includes('acidity')) {
+                      meds.push({
+                        medicine_name: "Antacid Gel / Pantoprazole 40mg",
+                        dosage: "1 Tablet (or 2 tsp antacid gel)",
+                        frequency: "Once daily in morning before breakfast",
+                        duration: "3 - 5 Days",
+                        instructions: "Relieves burning sensation and gastric discomfort."
+                      });
+                    }
+                    if (syms.includes('dizziness') || syms.includes('weakness') || syms.includes('fatigue')) {
+                      meds.push({
+                        medicine_name: "Oral Electrolyte Solution (Electral / Glucose-D)",
+                        dosage: "1-2 Glasses daily",
+                        frequency: "Twice daily",
+                        duration: "3 Days",
+                        instructions: "Rest in a well-ventilated cool area and keep hydrated."
+                      });
+                    }
+                    if (meds.length === 0) {
+                      meds.push({
+                        medicine_name: "Paracetamol 500mg (ASHA Essential Kit)",
+                        dosage: "1 Tablet as needed",
+                        frequency: "Every 8 hours after meals for pain/fever relief",
+                        duration: "2 - 3 Days",
+                        instructions: "Take after meals for temporary relief while awaiting PHC medical officer review."
+                      });
+                      meds.push({
+                        medicine_name: "Oral Rehydration Salts (ORS)",
+                        dosage: "1 Sachet in 1 Liter clean drinking water",
+                        frequency: "Sip throughout the day",
+                        duration: "2 Days",
+                        instructions: "Maintains hydration and vital electrolyte balance."
+                      });
+                    }
+                  }
+
+                  return (
+                    <div className="bg-emerald-50 border-2 border-emerald-300 p-5 rounded-2xl space-y-4 shadow-sm animate-fade-in">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200 pb-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                            💊
+                          </span>
+                          <div>
+                            <h4 className="font-black text-emerald-950 text-sm sm:text-base">
+                              Prescribed Primary Medications (ASHA Essential Drug Kit)
+                            </h4>
+                            <p className="text-xs text-emerald-700 font-medium">
+                              Supportive first-line treatment for Moderate / Medium risk cases
+                            </p>
+                          </div>
+                        </div>
+                        <span className="self-start sm:self-auto px-3 py-1 bg-emerald-200 text-emerald-950 text-xs font-black rounded-full uppercase tracking-wider">
+                          Medium Risk Protocol
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {meds.map((med, idx) => (
+                          <div key={idx} className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-2 hover:border-emerald-400 transition">
+                            <div className="flex items-start justify-between gap-2">
+                              <h5 className="font-black text-emerald-950 text-sm flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                {med.medicine_name}
+                              </h5>
+                              <span className="text-[11px] font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-lg shrink-0">
+                                {med.duration}
+                              </span>
+                            </div>
+
+                            <div className="text-xs text-slate-700 space-y-1.5 pt-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900 w-20 shrink-0">Dosage:</span>
+                                <span className="font-medium text-slate-800">{med.dosage}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900 w-20 shrink-0">Frequency:</span>
+                                <span className="font-medium text-slate-800">{med.frequency}</span>
+                              </div>
+                              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-slate-700 text-xs mt-2">
+                                <strong className="text-slate-900 font-bold block mb-0.5">Instructions:</strong>
+                                <p className="italic text-slate-600 leading-relaxed">{med.instructions}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="bg-emerald-100/70 border border-emerald-300 p-3.5 rounded-xl text-xs text-emerald-950 flex items-start gap-2.5">
+                        <span className="font-extrabold text-emerald-800 text-base leading-none">ℹ️</span>
+                        <span className="leading-relaxed">
+                          <strong>ASHA Protocol Notice:</strong> These medications are supportive first-line measures from standard rural ASHA kits. The patient must visit the PHC Medical Officer for clinical review if symptoms persist or do not improve within 48-72 hours.
+                        </span>
                       </div>
                     </div>
-                    <span className="self-start sm:self-auto px-3 py-1 bg-emerald-200 text-emerald-950 text-xs font-black rounded-full uppercase tracking-wider">
-                      Medium Risk Protocol
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {assessmentResult.prescriptions.map((med, idx) => (
-                      <div key={idx} className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-2 hover:border-emerald-400 transition">
-                        <div className="flex items-start justify-between gap-2">
-                          <h5 className="font-black text-emerald-950 text-sm flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
-                            {med.medicine_name}
-                          </h5>
-                          <span className="text-[11px] font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-lg shrink-0">
-                            {med.duration}
-                          </span>
-                        </div>
-
-                        <div className="text-xs text-slate-700 space-y-1.5 pt-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 w-20 shrink-0">Dosage:</span>
-                            <span className="font-medium text-slate-800">{med.dosage}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 w-20 shrink-0">Frequency:</span>
-                            <span className="font-medium text-slate-800">{med.frequency}</span>
-                          </div>
-                          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-slate-700 text-xs mt-2">
-                            <strong className="text-slate-900 font-bold block mb-0.5">Instructions:</strong>
-                            <p className="italic text-slate-600 leading-relaxed">{med.instructions}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="bg-emerald-100/70 border border-emerald-300 p-3.5 rounded-xl text-xs text-emerald-950 flex items-start gap-2.5">
-                    <span className="font-extrabold text-emerald-800 text-base leading-none">ℹ️</span>
-                    <span className="leading-relaxed">
-                      <strong>ASHA Protocol Notice:</strong> These medications are supportive first-line measures from standard rural ASHA kits. The patient must visit the PHC Medical Officer for clinical review if symptoms persist or do not improve within 48-72 hours.
-                    </span>
-                  </div>
-                </div>
+                  );
+                })()
               )}
 
               {/* Medical Safety Disclaimer Notice */}

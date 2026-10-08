@@ -115,6 +115,7 @@ export async function runRiskAssessment(assessmentReq) {
       risk_factors: offlineResult.risk_factors,
       recommendation_title: offlineResult.recommendation_title,
       recommendations: offlineResult.recommendations,
+      prescriptions: offlineResult.prescriptions || [],
       urgency_note: offlineResult.urgency_note,
       created_at: new Date().toISOString(),
       assessment_source: 'OFFLINE_FALLBACK',
@@ -154,6 +155,7 @@ export async function runRiskAssessment(assessmentReq) {
       risk_factors: offlineResult.risk_factors,
       recommendation_title: offlineResult.recommendation_title,
       recommendations: offlineResult.recommendations,
+      prescriptions: offlineResult.prescriptions || [],
       urgency_note: offlineResult.urgency_note,
       created_at: new Date().toISOString(),
       assessment_source: 'OFFLINE_FALLBACK'
