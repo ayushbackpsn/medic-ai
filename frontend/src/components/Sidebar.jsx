@@ -12,17 +12,33 @@ export default function Sidebar() {
 
   const role = user.role;
 
-  const links = [
-    { to: "/dashboard", label: t('dashboard'), icon: LayoutDashboard, roles: ['ASHA', 'PHC_STAFF', 'ADMIN'] },
-    { to: "/patients", label: t('patients'), icon: Users, roles: ['ASHA', 'ADMIN'] },
-    { to: "/patients/new", label: t('new_patient'), icon: UserPlus, roles: ['ASHA'] },
-    { to: "/referrals", label: t('referrals'), icon: FileSpreadsheet, roles: ['ASHA', 'PHC_STAFF', 'ADMIN'] },
-    { to: "/phc", label: t('phc_portal'), icon: Hospital, roles: ['PHC_STAFF', 'ADMIN'] },
-    { to: "/admin", label: t('admin'), icon: ShieldCheck, roles: ['ADMIN'] },
-    { to: "/offline", label: t('offline_sync'), icon: WifiOff, roles: ['ASHA', 'PHC_STAFF', 'ADMIN'] },
-  ];
+  let links = [];
 
-  const filteredLinks = links.filter(l => l.roles.includes(role));
+  if (role === 'PHC_STAFF') {
+    links = [
+      { to: "/phc", label: t('phc_portal') || "PHC Doctor Portal", icon: Hospital },
+      { to: "/referrals", label: t('referrals') || "Referred Patients", icon: FileSpreadsheet },
+      { to: "/patients", label: t('patients') || "Patients Directory", icon: Users },
+      { to: "/offline", label: t('offline_sync') || "Offline Sync", icon: WifiOff },
+    ];
+  } else if (role === 'ADMIN') {
+    links = [
+      { to: "/admin", label: t('admin') || "System Administration", icon: ShieldCheck },
+      { to: "/phc", label: t('phc_portal') || "PHC Overview", icon: Hospital },
+      { to: "/patients", label: t('patients') || "All Patients", icon: Users },
+      { to: "/referrals", label: t('referrals') || "Referrals Oversight", icon: FileSpreadsheet },
+      { to: "/offline", label: t('offline_sync') || "Sync Logs", icon: WifiOff },
+    ];
+  } else {
+    // Default ASHA Worker
+    links = [
+      { to: "/dashboard", label: t('dashboard'), icon: LayoutDashboard },
+      { to: "/patients", label: t('patients'), icon: Users },
+      { to: "/patients/new", label: t('new_patient'), icon: UserPlus },
+      { to: "/referrals", label: t('referrals'), icon: FileSpreadsheet },
+      { to: "/offline", label: t('offline_sync'), icon: WifiOff },
+    ];
+  }
 
   return (
     <aside className="w-full md:w-64 bg-white border-r border-slate-200 shadow-sm shrink-0">

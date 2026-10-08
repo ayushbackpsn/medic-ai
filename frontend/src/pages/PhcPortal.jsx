@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchReferrals } from '../services/api';
+import { fetchReferrals, updateReferralStatus } from '../services/api';
 import RiskBadge from '../components/RiskBadge';
 import { Hospital, CheckCircle2, Clock, MessageSquare, ShieldAlert } from 'lucide-react';
 
@@ -32,16 +32,7 @@ export default function PhcPortal() {
     if (!selectedRef) return;
     setUpdating(true);
     try {
-      const token = localStorage.getItem('asha_token');
-      const res = await fetch(`/api/referrals/${selectedRef.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus, remarks })
-      });
-      if (!res.ok) throw new Error("Status update failed");
+      await updateReferralStatus(selectedRef.id, { status: newStatus, remarks });
       alert(`Referral status updated to ${newStatus}`);
       setSelectedRef(null);
       setRemarks('');

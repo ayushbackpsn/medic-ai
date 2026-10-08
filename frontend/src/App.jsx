@@ -22,7 +22,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import OfflineManager from './pages/OfflineManager';
 
 function ProtectedLayout() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center font-bold text-sky-700">Loading ASHA System...</div>;
@@ -32,6 +32,9 @@ function ProtectedLayout() {
     return <Navigate to="/login" replace />;
   }
 
+  const role = user?.role;
+  const defaultHome = role === 'PHC_STAFF' ? '/phc' : role === 'ADMIN' ? '/admin' : '/dashboard';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       <Navbar />
@@ -40,7 +43,11 @@ function ProtectedLayout() {
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={
+              role === 'PHC_STAFF' ? <Navigate to="/phc" replace /> :
+              role === 'ADMIN' ? <Navigate to="/admin" replace /> :
+              <Dashboard />
+            } />
             <Route path="/patients" element={<PatientList />} />
             <Route path="/patients/new" element={<PatientRegistrationWizard />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
@@ -52,7 +59,7 @@ function ProtectedLayout() {
             <Route path="/phc" element={<PhcPortal />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/offline" element={<OfflineManager />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to={defaultHome} replace />} />
           </Routes>
         </main>
       </div>

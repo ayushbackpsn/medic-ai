@@ -19,12 +19,13 @@ export default function AdminDashboard() {
   const loadAdminData = async () => {
     setLoading(true);
     try {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('asha_token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [resStats, resUsers] = await Promise.all([
-        fetch('/api/admin/stats', { headers }),
-        fetch('/api/admin/users', { headers })
+        fetch(`${API_BASE}/api/admin/stats`, { headers }),
+        fetch(`${API_BASE}/api/admin/users`, { headers })
       ]);
 
       if (resStats.ok) setStats(await resStats.json());
@@ -39,8 +40,9 @@ export default function AdminDashboard() {
   const handleCreateUserSubmit = async (e) => {
     e.preventDefault();
     try {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
       const token = localStorage.getItem('asha_token');
-      const res = await fetch('/api/admin/users', {
+      const res = await fetch(`${API_BASE}/api/admin/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
