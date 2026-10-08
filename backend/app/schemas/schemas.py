@@ -119,6 +119,13 @@ class SymptomOut(SymptomItem):
         from_attributes = True
 
 # Assessment Schemas
+class PrescriptionItem(BaseModel):
+    medicine_name: str
+    dosage: str
+    frequency: str
+    duration: str
+    instructions: str
+
 class AssessmentRequest(BaseModel):
     patient_id: str
     vitals: VitalSignsCreate
@@ -135,6 +142,7 @@ class AssessmentOut(BaseModel):
     risk_factors: List[str]
     recommendation_title: str
     recommendations: List[str]
+    prescriptions: Optional[List[PrescriptionItem]] = []
     urgency_note: str
     created_at: datetime
     assessment_source: str

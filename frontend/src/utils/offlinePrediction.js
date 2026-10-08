@@ -119,6 +119,7 @@ export function calculateOfflineRisk(patientData, vitals, medicalHistory, sympto
   let title = "";
   let actions = [];
   let urgency = "";
+  let prescriptions = [];
 
   if (riskLevel === "LOW") {
     title = "Routine Monitoring & Home Care";
@@ -129,13 +130,102 @@ export function calculateOfflineRisk(patientData, vitals, medicalHistory, sympto
     ];
     urgency = "Non-urgent";
   } else if (riskLevel === "MEDIUM") {
-    title = "Follow-Up & Medical Consultation Recommended";
+    title = "Follow-Up, Medical Consultation & Primary Medication";
     actions = [
       "Consult PHC Medical Officer within 48-72 hours.",
+      "Administer prescribed ASHA Kit essential medicines below according to dosage.",
       "Monitor vitals daily.",
-      "Provide OTC symptom relief as appropriate."
+      "Watch for emerging warning signs (difficulty breathing, continuous vomiting, high fever)."
     ];
-    urgency = "Moderate Priority";
+    urgency = "Moderate Priority. Start primary medications and visit PHC within 48-72h.";
+
+    // Generate prescriptions for Medium Risk
+    if (symptomList.includes('fever') || temp >= 37.8 || symptomList.includes('headache') || symptomList.includes('severe_pain')) {
+      prescriptions.push({
+        medicine_name: "Paracetamol (PCM) 500mg",
+        dosage: "1 Tablet (500mg)",
+        frequency: "Every 6-8 hours as needed (Max 3-4 tablets/day)",
+        duration: "3 Days",
+        instructions: "Take after food for fever/pain. Consult PHC doctor if fever lasts > 3 days."
+      });
+    }
+    if (symptomList.includes('cough') || symptomList.includes('cold') || symptomList.includes('sore throat')) {
+      prescriptions.push({
+        medicine_name: "Cetirizine 10mg",
+        dosage: "1 Tablet (10mg)",
+        frequency: "Once daily at bedtime",
+        duration: "3 - 5 Days",
+        instructions: "Relieves cold, sneezing, and cough. May cause mild drowsiness."
+      });
+      prescriptions.push({
+        medicine_name: "Steam Inhalation & Saline Gargle",
+        dosage: "Steam for 5-10 mins",
+        frequency: "2 - 3 Times daily",
+        duration: "4 - 5 Days",
+        instructions: "Loosens chest congestion and relieves throat irritation."
+      });
+    }
+    if (symptomList.includes('diarrhea')) {
+      prescriptions.push({
+        medicine_name: "Oral Rehydration Salts (ORS)",
+        dosage: "1 Sachet in 1 Liter clean boiled water",
+        frequency: "Drink continuously after every loose stool",
+        duration: "3 Days",
+        instructions: "Prevents dehydration and restores electrolytes."
+      });
+      prescriptions.push({
+        medicine_name: "Zinc Sulfate 20mg",
+        dosage: "1 Tablet (20mg)",
+        frequency: "Once daily after meals",
+        duration: "14 Days",
+        instructions: "Promotes gut healing and reduces recurrence."
+      });
+    }
+    if (symptomList.includes('vomiting') || symptomList.includes('nausea')) {
+      prescriptions.push({
+        medicine_name: "Domperidone 10mg / Ondansetron 4mg",
+        dosage: "1 Tablet",
+        frequency: "Twice daily 30 mins before food",
+        duration: "2 Days",
+        instructions: "Take with small sips of water. Avoid oily or heavy foods."
+      });
+    }
+    if (symptomList.includes('abdominal pain') || symptomList.includes('acidity')) {
+      prescriptions.push({
+        medicine_name: "Antacid Gel / Pantoprazole 40mg",
+        dosage: "1 Tablet (or 2 tsp antacid gel)",
+        frequency: "Once daily in morning before breakfast",
+        duration: "3 - 5 Days",
+        instructions: "Relieves burning sensation and gastric discomfort."
+      });
+    }
+    if (symptomList.includes('dizziness') || symptomList.includes('weakness') || symptomList.includes('fatigue')) {
+      prescriptions.push({
+        medicine_name: "Oral Electrolyte Solution (Electral / Glucose-D)",
+        dosage: "1-2 Glasses daily",
+        frequency: "Twice daily",
+        duration: "3 Days",
+        instructions: "Rest in a well-ventilated cool area and keep hydrated."
+      });
+    }
+
+    if (prescriptions.length === 0) {
+      prescriptions.push({
+        medicine_name: "Paracetamol 500mg (ASHA Kit)",
+        dosage: "1 Tablet as needed",
+        frequency: "Every 8 hours after food for pain/fever",
+        duration: "2 - 3 Days",
+        instructions: "Take after meals for temporary relief while awaiting PHC visit."
+      });
+      prescriptions.push({
+        medicine_name: "Oral Rehydration Salts (ORS)",
+        dosage: "1 Sachet in 1 Liter clean water",
+        frequency: "Throughout the day",
+        duration: "2 Days",
+        instructions: "Ensure adequate hydration and proper rest."
+      });
+    }
+
   } else if (riskLevel === "HIGH") {
     title = "Prompt Healthcare Referral Required";
     actions = [
@@ -160,6 +250,7 @@ export function calculateOfflineRisk(patientData, vitals, medicalHistory, sympto
     risk_factors: riskFactors,
     recommendation_title: title,
     recommendations: actions,
+    prescriptions: prescriptions,
     urgency_note: urgency,
     assessment_source: "OFFLINE_FALLBACK"
   };

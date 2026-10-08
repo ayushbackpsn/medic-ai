@@ -5,13 +5,18 @@ import json
 import pandas as pd
 import numpy as np
 
-def prepare_data(data_dir="backend/data"):
-    os.makedirs(data_dir, exist_ok=True)
-    workspace_dir = os.getcwd()
+def prepare_data(data_dir=None):
+    script_dir = os.path.dirname(os.path.abspath(__file__)) # sw/backend/ml
+    backend_dir = os.path.dirname(script_dir)               # sw/backend
+    project_root = os.path.dirname(backend_dir)             # sw
     
-    triagegeist_path = os.path.join(workspace_dir, "triagegeist.zip")
-    archive_path = os.path.join(workspace_dir, "archive (1).zip")
-    severity_path = os.path.join(workspace_dir, "Symptom-severity.csv")
+    if data_dir is None:
+        data_dir = os.path.join(backend_dir, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    
+    triagegeist_path = os.path.join(project_root, "triagegeist.zip")
+    archive_path = os.path.join(project_root, "archive (1).zip")
+    severity_path = os.path.join(project_root, "Symptom-severity.csv")
     
     print("Extracting and processing dataset files...")
     
