@@ -1,5 +1,7 @@
 import { getSyncQueue, clearSyncQueueItem } from './db';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export async function processSyncQueue() {
   if (!navigator.onLine) {
     return { success: false, message: "Cannot sync while offline." };
@@ -16,7 +18,7 @@ export async function processSyncQueue() {
   }
 
   try {
-    const response = await fetch('/api/sync', {
+    const response = await fetch(`${API_BASE}/api/sync`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,12 +28,13 @@ export async function processSyncQueue() {
     });
 
     if (!response.ok) {
-      throw new Error(`Sync server responded with ${response.status}`);
+      const errText = await response.text();
+      throw new Error(`Sync failed (${response.status}): ${errText}`);
     }
 
     const data = await response.json();
 
-    // Clear synced items
+    // Clear synced items from local queue
     for (const item of queue) {
       await clearSyncQueueItem(item.local_id);
     }

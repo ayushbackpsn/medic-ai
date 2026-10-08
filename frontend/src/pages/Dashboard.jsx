@@ -23,22 +23,27 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        if (navigator.onLine) {
-          const token = localStorage.getItem('asha_token');
-          const res = await fetch('/api/dashboard/stats', {
+        const API_BASE = import.meta.env.VITE_API_URL || '';
+        const token = localStorage.getItem('asha_token');
+        const patients = await fetchPatients();
+        setRecentPatients(patients.slice(0, 5));
+
+        if (navigator.onLine && token) {
+          const res = await fetch(`${API_BASE}/api/dashboard/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {
             const data = await res.json();
-            setStats(data);
+            const maxPatients = Math.max(data.total_patients || 0, patients.length);
+            setStats({ ...data, total_patients: maxPatients });
+            return;
           }
         }
 
-        const patients = await fetchPatients();
-        setRecentPatients(patients.slice(0, 5));
-        if (!navigator.onLine) {
-          setStats(prev => ({ ...prev, total_patients: patients.length }));
-        }
+        setStats(prev => ({
+          ...prev,
+          total_patients: patients.length
+        }));
       } catch (err) {
         console.error(err);
       } finally {

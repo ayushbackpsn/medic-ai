@@ -34,7 +34,7 @@ export async function fetchPatients(search = '') {
   if (!navigator.onLine) {
     const local = await getLocalPatients();
     if (search) {
-      return local.filter(p => p.full_name.toLowerCase().includes(search.toLowerCase()) || p.id.includes(search));
+      return local.filter(p => (p.full_name || '').toLowerCase().includes(search.toLowerCase()) || (p.id || '').includes(search));
     }
     return local;
   }
@@ -49,7 +49,15 @@ export async function fetchPatients(search = '') {
     for (const p of data) {
       await savePatientLocally(p);
     }
-    return data;
+    // Also include any local unsynced offline patients
+    const local = await getLocalPatients();
+    const serverIds = new Set(data.map(p => p.id));
+    const unsynced = local.filter(p => p && p.id && !serverIds.has(p.id));
+    const combined = [...data, ...unsynced];
+    if (search) {
+      return combined.filter(p => (p.full_name || '').toLowerCase().includes(search.toLowerCase()) || (p.id || '').includes(search));
+    }
+    return combined;
   } catch (err) {
     console.warn('API unavailable, fallback to IndexedDB:', err);
     return getLocalPatients();
@@ -236,7 +244,7 @@ export async function syncOfflineData(queue) {
   const res = await fetch(`${API_BASE}/api/sync`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ records: queue })
+    body: JSON.stringify({ items: queue })
   });
   if (!res.ok) throw new Error('Sync failed');
   return res.json();
